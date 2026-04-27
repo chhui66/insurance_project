@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>确认支付 | 运动宝</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(145deg, #f0f4fa 0%, #e2eaf1 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+        }
+        .pay-card {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+        .amount {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #2c5282;
+            margin: 1rem 0;
+        }
+        .order-info {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+        .order-info p {
+            margin-bottom: 0.5rem;
+        }
+        .btn-pay {
+            background: linear-gradient(115deg, #2f855a, #276749);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.8rem;
+            width: 100%;
+            font-weight: 600;
+            color: white;
+            margin-top: 1rem;
+        }
+        .btn-pay:hover {
+            background: linear-gradient(115deg, #38a169, #2f855a);
+            transform: translateY(-2px);
+        }
+        .back-link {
+            display: block;
+            margin-top: 1rem;
+            color: #6c757d;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="pay-card">
+        <i class="fas fa-credit-card fa-3x text-primary"></i>
+        <h3 class="mt-2">订单确认</h3>
+        <div class="order-info">
+            <p><strong>产品名称：</strong> {{ policy.product_name }}</p>
+            <p><strong>被保险人：</strong> {{ policy.insured_name }}</p>
+            <p><strong>保障天数：</strong> {{ policy.days }} 天</p>
+            <p><strong>联系方式：</strong> {{ policy.contact }}</p>
+        </div>
+        <div class="amount">¥{{ policy.total_premium }}</div>
+        <form method="post" action="/insurance/confirm_pay">
+            <button type="submit" class="btn-pay"><i class="fas fa-check-circle"></i> 确认支付</button>
+        </form>
+        <a href="/insurance/products" class="back-link">← 返回产品列表</a>
+    </div>
+</body>
+</html>

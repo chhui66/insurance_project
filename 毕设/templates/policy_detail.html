@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>保单详情 - {{ product.name if product else '保单详情' }} | 运动宝</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #eef2f9 0%, #e0e8f0 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+        }
+        /* 顶部导航栏（与首页一致） */
+        .top-nav {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.8rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #2c5282, #3182ce);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: #3182ce;
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .btn-outline-primary {
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
+        }
+
+        /* 主内容容器 */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        /* 两栏布局 */
+        .policy-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        /* 卡片样式 */
+        .info-card, .coverage-card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #2c5282, #1e3a5f);
+            padding: 1rem 1.5rem;
+            color: white;
+        }
+        .card-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #5b7a9a;
+            font-size: 0.9rem;
+        }
+        .info-value {
+            font-weight: 500;
+            color: #1e2f3e;
+            font-size: 0.95rem;
+            text-align: right;
+            word-break: break-word;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: #e6fffa;
+            color: #2c7a7b;
+        }
+        .status-badge.expired {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        .coverage-content {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #2c3e50;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: flex-end;
+        }
+        .btn-secondary {
+            background-color: #64748b;
+            border: none;
+            border-radius: 2rem;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #475569;
+            transform: translateY(-2px);
+        }
+        .btn-claim {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+        .btn-claim:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0.8rem 1rem;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+            .main-container {
+                padding: 0 1rem;
+            }
+            .policy-detail-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+            .info-value {
+                text-align: left;
+            }
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-secondary, .btn-claim {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+        <a href="/" class="logo">
+            <i class="fas fa-shield-alt me-2"></i>运动宝
+        </a>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/insurance/products">保险商城</a>
+            <a href="/calc">运动评估</a>
+            <a href="/user_chat">在线客服</a>
+            {% if session.username %}
+                <div class="dropdown">
+                    <a href="#" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i>{{ session.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/my">个人中心</a></li>
+                        <li><a class="dropdown-item" href="/profile">编辑资料</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout">退出登录</a></li>
+                    </ul>
+                </div>
+            {% else %}
+                <div class="user-menu">
+                    <a href="/login" class="btn btn-outline-primary">登录</a>
+                    <a href="/register" class="btn btn-primary">注册</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="policy-detail-grid">
+            <!-- 左侧：保单信息 -->
+            <div class="info-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-file-contract"></i> 保单信息</h3>
+                </div>
+                <div class="card-body">
+                    <div class="info-row">
+                        <span class="info-label">产品名称</span>
+                        <span class="info-value">{{ product.name if product else '已下架' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">保单号</span>
+                        <span class="info-value">{{ policy.policy_no }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">被保险人</span>
+                        <span class="info-value">{{ policy.insured_name }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">身份证号</span>
+                        <span class="info-value">{{ policy.insured_id_card }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">联系方式</span>
+                        <span class="info-value">{{ policy.contact or '未提供' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">实际保费</span>
+                        <span class="info-value">¥{{ policy.premium }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">保障期间</span>
+                        <span class="info-value">{{ policy.start_date }} 至 {{ policy.end_date }}<br><small>共 {{ days }} 天</small></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">保单状态</span>
+                        <span class="info-value">
+                            <span class="status-badge {% if policy.status != '有效' %}expired{% endif %}">{{ policy.status }}</span>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">投保时间</span>
+                        <span class="info-value">{{ policy.create_time.strftime('%Y-%m-%d %H:%M') if policy.create_time else '未知' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：保障内容 + 操作按钮 -->
+            <div class="coverage-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-shield-alt"></i> 保障内容</h3>
+                </div>
+                <div class="card-body">
+                    <div class="coverage-content">
+                        {{ product.coverage if product and product.coverage else '暂无详细保障内容，请联系客服咨询。' }}
+                    </div>
+                    <div class="action-buttons">
+                        <a href="/insurance/my_policies" class="btn-secondary">
+                            <i class="fas fa-arrow-left"></i> 返回我的保单
+                        </a>
+                        {% if policy.status == '有效' %}
+                        <a href="/insurance/claim/{{ policy.id }}" class="btn-claim">
+                            <i class="fas fa-file-invoice"></i> 申请理赔
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

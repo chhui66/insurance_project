@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>运动宝 - 首页</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(145deg, #eef2f9 0%, #e0e8f0 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            color: #1e2f3e;
+        }
+        .top-nav {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.8rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #2c5282, #3182ce);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active { color: #3182ce; }
+        .user-menu { display: flex; align-items: center; gap: 1rem; }
+        .btn-outline-primary {
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
+        }
+
+        /* 公告横幅样式 */
+        .announcement-banner {
+            background: linear-gradient(105deg, #fff3e0, #ffe6cc);
+            border-bottom: 1px solid #ffd9b5;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 999;
+            font-size: 0.95rem;
+            color: #b45309;
+        }
+        .banner-content {
+            flex: 1;
+            text-align: center;
+        }
+        .banner-content i {
+            color: #f59e0b;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: #b45309;
+            padding: 0 0.5rem;
+            transition: opacity 0.2s;
+        }
+        .close-btn:hover {
+            opacity: 0.7;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        /* 欢迎横幅 */
+        .welcome-banner {
+            background: linear-gradient(105deg, #f8fafd, #ffffff);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #eef2f8;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            text-align: center;
+        }
+        .welcome-banner h3 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; color: #1e2f3e; }
+        .welcome-banner p { color: #5b7a9a; font-size: 1rem; }
+        /* 搜索栏 */
+        .search-bar {
+            max-width: 700px;
+            margin: 0 auto 2rem auto;
+        }
+        /* 推荐产品网格 */
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #3182ce;
+            padding-left: 1rem;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .product-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.15);
+        }
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+            background: #f0f2f5;
+        }
+        .card-body { padding: 1.2rem; }
+        .product-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .product-desc { font-size: 0.85rem; color: #6c757d; margin-bottom: 1rem; line-height: 1.4; }
+        .product-price { font-size: 1.2rem; font-weight: 700; color: #f97316; margin-bottom: 1rem; }
+        .btn-sm-custom {
+            background: #3182ce;
+            color: white;
+            border-radius: 2rem;
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        /* 双栏资讯区 */
+        .info-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .info-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .info-card h4 { font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; border-left: 3px solid #3182ce; padding-left: 0.75rem; }
+        .knowledge-item, .news-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #edf2f7;
+            cursor: pointer;
+        }
+        .knowledge-item:last-child, .news-item:last-child { border-bottom: none; }
+        .knowledge-icon { width: 40px; height: 40px; border-radius: 8px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; }
+        .knowledge-title { font-weight: 600; margin-bottom: 0.25rem; }
+        .knowledge-summary { font-size: 0.75rem; color: #6c757d; }
+        .news-title { font-weight: 500; margin-bottom: 0.25rem; }
+        .news-time { font-size: 0.7rem; color: #94a3b8; }
+        .footer-note {
+            background: rgba(230,242,255,0.6);
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #2c5a7a;
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            .top-nav { flex-direction: column; gap: 0.5rem; padding: 0.8rem 1rem; }
+            .nav-links { flex-wrap: wrap; justify-content: center; gap: 1rem; }
+            .main-container { padding: 0 1rem; }
+            .info-section { grid-template-columns: 1fr; }
+            .announcement-banner { padding: 0.6rem 1rem; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <a href="/" class="logo"><i class="fas fa-shield-alt me-2"></i>运动宝</a>
+        <div class="nav-links">
+            <a href="/" class="active">首页</a>
+            <a href="/insurance/products">保险商城</a>
+            <a href="/calc">运动评估</a>
+            {% if session.username %}
+                <div class="dropdown">
+                    <a href="#" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i>{{ session.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/my">个人中心</a></li>
+                        <li><a class="dropdown-item" href="/profile">编辑资料</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout">退出登录</a></li>
+                    </ul>
+                </div>
+            {% else %}
+                <div class="user-menu">
+                    <a href="/login" class="btn btn-outline-primary">登录</a>
+                    <a href="/register" class="btn btn-primary">注册</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 公告横幅（仅当有启用公告时显示） -->
+    {% if announcement and announcement.content %}
+    <div id="announcementBanner" class="announcement-banner">
+        <div class="banner-content">
+            <i class="fas fa-bullhorn me-2"></i>
+            {{ announcement.content|safe }}
+        </div>
+        <button class="close-btn" onclick="closeAnnouncement()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    {% endif %}
+
+    <div class="main-container">
+        {% if username %}
+            <div class="welcome-banner">
+                <h3>欢迎回来，{{ username }}！</h3>
+                <p><i class="fas fa-calendar-alt"></i> 今日运动活力满满，开启健康保障之旅</p>
+            </div>
+            <div class="search-bar">
+                <div class="input-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="搜索保险产品名称、描述...">
+                    <button class="btn btn-primary" type="button" id="searchBtn"><i class="fas fa-search"></i> 搜索</button>
+                </div>
+                <div id="searchResults" class="product-grid mt-3" style="display: none;"></div>
+            </div>
+            {% if recommended_products %}
+                <div class="section-title"><i class="fas fa-shield-heart me-2"></i> 为您精选的保障方案</div>
+                <div class="product-grid" id="recommendedGrid">
+                    {% for product in recommended_products %}
+                    <div class="product-card">
+                        <div class="card-img-top" style="height:180px; overflow:hidden;">
+                            <img src="{{ url_for('static', filename=product.image) }}"
+                                alt="{{ product.name }}"
+                                style="width:100%; height:100%; object-fit:cover;"
+                                onerror="this.onerror=null; this.src='{{ url_for('static', filename='default_product.jpg') }}';">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="product-name">{{ product.name }}</h5>
+                            <p class="product-desc">{{ product.description[:80] }}{% if product.description|length > 80 %}...{% endif %}</p>
+                            <div class="product-price">¥{{ "%.2f"|format(product.premium_base) }}<small class="text-muted">/天</small></div>
+                            <a href="/insurance/buy/{{ product.id }}" class="btn-sm-custom">查看详情 <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mb-4"><a href="/insurance/products" class="btn btn-outline-primary">浏览更多保险产品 <i class="fas fa-external-link-alt"></i></a></div>
+            {% else %}
+                <div class="alert alert-info text-center">暂无推荐产品，请先完善个人信息或稍后查看。</div>
+            {% endif %}
+        {% else %}
+            <div class="welcome-banner">
+                <h3>探索运动宝</h3>
+                <p><i class="fas fa-shield-alt"></i> 登录后解锁运动健康评估与专属保障服务</p>
+            </div>
+            <div class="search-bar">
+                <div class="input-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="搜索保险产品...">
+                    <button class="btn btn-primary" type="button" id="searchBtn"><i class="fas fa-search"></i> 搜索</button>
+                </div>
+                <div id="searchResults" class="product-grid mt-3" style="display: none;"></div>
+            </div>
+            <div class="section-title"><i class="fas fa-star-of-life"></i> 平台核心功能</div>
+            <div class="product-grid">
+                <div class="product-card"><div class="card-img-top"><i class="fas fa-weight-scale fa-2x text-primary"></i></div><div class="card-body"><h5 class="product-name">BMI / 体脂评估</h5><p class="product-desc">科学身体指数，健康等级分析</p></div></div>
+                <div class="product-card"><div class="card-img-top"><i class="fas fa-fire fa-2x text-warning"></i></div><div class="card-body"><h5 class="product-name">基础代谢率(BMR)</h5><p class="product-desc">精准热量消耗，定制饮食建议</p></div></div>
+                <div class="product-card"><div class="card-img-top"><i class="fas fa-shield-alt fa-2x text-info"></i></div><div class="card-body"><h5 class="product-name">运动保险保障</h5><p class="product-desc">个性化健康险，安心运动无忧</p></div></div>
+            </div>
+        {% endif %}
+
+        <!-- 双栏资讯区（知识+动态） -->
+        <div class="info-section">
+            <div class="info-card">
+                <h4><i class="fas fa-book-open me-2"></i> 保险知识</h4>
+                <a href="/knowledge/buy_insurance" class="knowledge-item" style="text-decoration: none; color: inherit;">
+                    <div class="knowledge-icon"><i class="fas fa-question-circle"></i></div>
+                    <div><div class="knowledge-title">运动保险怎么买？</div><div class="knowledge-summary">选择适合自己的保障计划</div></div>
+                </a>
+                <a href="/knowledge/claim_process" class="knowledge-item" style="text-decoration: none; color: inherit;">
+                    <div class="knowledge-icon"><i class="fas fa-file-invoice"></i></div>
+                    <div><div class="knowledge-title">理赔流程详解</div><div class="knowledge-summary">三步搞定理赔</div></div>
+                </a>
+                <a href="/knowledge/injury_handling" class="knowledge-item" style="text-decoration: none; color: inherit;">
+                    <div class="knowledge-icon"><i class="fas fa-band-aid"></i></div>
+                    <div><div class="knowledge-title">运动受伤如何处理</div><div class="knowledge-summary">急救常识与保险报销</div></div>
+                </a>
+            </div>
+            <div class="info-card">
+                <h4><i class="fas fa-newspaper me-2"></i> 行业动态</h4>
+                <a href="/news/plan" class="news-item" style="text-decoration: none; color: inherit;">
+                    <div><div class="news-title">国家体育总局推动全民健身计划</div><div class="news-time">2025-03-20</div></div>
+                </a>
+                <a href="/news/market" class="news-item" style="text-decoration: none; color: inherit;">
+                    <div><div class="news-title">运动保险市场快速增长</div><div class="news-time">2025-03-18</div></div>
+                </a>
+                <a href="/news/marathon" class="news-item" style="text-decoration: none; color: inherit;">
+                    <div><div class="news-title">马拉松赛事保险新规发布</div><div class="news-time">2025-03-15</div></div>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <i class="fas fa-bolt"></i> 📌 平台功能：BMI计算 | 基础代谢率(BMR)计算 | 运动卡路里消耗 | 个性化运动计划推荐 | 运动记录管理 | 数据可视化 | 智能保险推荐 | 在线投保理赔<br>
+            <small><i class="far fa-heart"></i> 科学运动，智慧保障 — 让健康与安心触手可及</small>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 公告关闭功能（使用 localStorage 记忆公告 ID）
+        function closeAnnouncement() {
+            const banner = document.getElementById('announcementBanner');
+            if (banner) {
+                banner.style.display = 'none';
+                const announcementId = '{{ announcement.id if announcement else '' }}';
+                if (announcementId) {
+                    localStorage.setItem('closedAnnouncementId', announcementId);
+                }
+            }
+        }
+
+        // 页面加载时检查是否已关闭当前公告
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentId = '{{ announcement.id if announcement else '' }}';
+            const storedId = localStorage.getItem('closedAnnouncementId');
+            if (currentId && storedId === currentId) {
+                const banner = document.getElementById('announcementBanner');
+                if (banner) banner.style.display = 'none';
+            }
+        });
+
+        // 原有的搜索功能
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const recommendedGrid = document.getElementById('recommendedGrid');
+        const searchResultsDiv = document.getElementById('searchResults');
+
+        function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) {
+                if (recommendedGrid) recommendedGrid.style.display = 'grid';
+                searchResultsDiv.style.display = 'none';
+                return;
+            }
+            searchResultsDiv.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> 搜索中...</div>';
+            searchResultsDiv.style.display = 'grid';
+            if (recommendedGrid) recommendedGrid.style.display = 'none';
+
+            fetch(`/insurance/search?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(products => {
+                    if (products.length === 0) {
+                        searchResultsDiv.innerHTML = '<div class="text-center text-muted">未找到相关保险产品</div>';
+                    } else {
+                        let html = '';
+                        products.forEach(p => {
+                            html += `
+                                <div class="product-card">
+                                    <div class="card-img-top" style="height:180px; overflow:hidden;">
+                                        <img src="${p.image_url}" alt="${escapeHtml(p.name)}"
+                                             style="width:100%; height:100%; object-fit:cover;"
+                                             onerror="this.onerror=null; this.src='/static/default_product.jpg';">
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="product-name">${escapeHtml(p.name)}</h5>
+                                        <p class="product-desc">${escapeHtml(p.description.substring(0,80))}${p.description.length>80?'...':''}</p>
+                                        <div class="product-price">¥${p.premium_base.toFixed(2)}<small class="text-muted">/天</small></div>
+                                        <a href="/insurance/buy/${p.id}" class="btn-sm-custom">查看详情 <i class="fas fa-arrow-right"></i></a>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        searchResultsDiv.innerHTML = html;
+                    }
+                })
+                .catch(err => { searchResultsDiv.innerHTML = '<div class="text-center text-danger">搜索失败，请重试</div>'; });
+        }
+        function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m; }); }
+        if(searchBtn) { searchBtn.addEventListener('click', performSearch); searchInput.addEventListener('keypress', function(e){ if(e.key==='Enter') performSearch(); }); }
+    </script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ '编辑' if product else '添加' }}产品</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/sw.js')
+    .then(reg => console.log('Service Worker 注册成功', reg))
+    .catch(err => console.log('Service Worker 注册失败', err));
+}
+</script>
+<body>
+    <div class="container mt-4">
+        <h2>{{ '编辑' if product else '添加' }}产品</h2>
+        <!-- 注意：必须添加 enctype="multipart/form-data" 以支持文件上传 -->
+        <form method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label>产品名称</label>
+                <input type="text" name="name" class="form-control" value="{{ product.name if product else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label>类别</label>
+                <select name="category" class="form-select">
+                    <option value="运动意外险" {% if product and product.category == '运动意外险' %}selected{% endif %}>运动意外险</option>
+                    <option value="健康险" {% if product and product.category == '健康险' %}selected{% endif %}>健康险</option>
+                    <option value="专项险" {% if product and product.category == '专项险' %}selected{% endif %}>专项险</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label>描述</label>
+                <textarea name="description" class="form-control" rows="3">{{ product.description if product else '' }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label>保障内容</label>
+                <textarea name="coverage" class="form-control" rows="3">{{ product.coverage if product else '' }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label>基础保费（元/天）</label>
+                <input type="number" step="0.01" name="premium_base" class="form-control" value="{{ product.premium_base if product else '' }}" required>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label>最小投保年龄</label>
+                    <input type="number" name="min_age" class="form-control" value="{{ product.min_age if product else 18 }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label>最大投保年龄</label>
+                    <input type="number" name="max_age" class="form-control" value="{{ product.max_age if product else 60 }}" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label>最小BMI（可选）</label>
+                    <input type="number" step="0.1" name="min_bmi" class="form-control" value="{{ product.min_bmi if product and product.min_bmi else '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label>最大BMI（可选）</label>
+                    <input type="number" step="0.1" name="max_bmi" class="form-control" value="{{ product.max_bmi if product and product.max_bmi else '' }}">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label>风险等级要求</label>
+                <select name="risk_level_required" class="form-select">
+                    <option value="">无要求</option>
+                    <option value="低" {% if product and product.risk_level_required == '低' %}selected{% endif %}>低风险</option>
+                    <option value="中" {% if product and product.risk_level_required == '中' %}selected{% endif %}>中风险</option>
+                    <option value="高" {% if product and product.risk_level_required == '高' %}selected{% endif %}>高风险</option>
+                </select>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" name="is_active" class="form-check-input" id="is_active" {% if product and product.is_active %}checked{% endif %}>
+                <label class="form-check-label" for="is_active">上架</label>
+            </div>
+
+            <!-- 新增：赛事保险专用标识 -->
+            <div class="mb-3 form-check">
+                <input type="checkbox" name="is_event_product" class="form-check-input" id="is_event_product" {% if product and product.is_event_product %}checked{% endif %}>
+                <label class="form-check-label" for="is_event_product">是否为赛事专用保险</label>
+            </div>
+
+            <!-- 图片上传部分 -->
+            <div class="mb-3">
+                <label>产品图片</label>
+                {% if product and product.image %}
+                    <div class="mb-2">
+                        <img src="{{ url_for('static', filename=product.image) }}" style="max-width: 200px; max-height: 150px; border-radius: 8px;">
+                        <br><small class="text-muted">当前图片</small>
+                    </div>
+                {% endif %}
+                <input type="file" name="image" class="form-control" accept="image/jpeg,image/png,image/gif">
+                <small class="form-text text-muted">支持jpg、png、gif，建议比例1:1，文件大小不超过2MB。若不修改，留空则保持原图。</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary">保存</button>
+            <a href="/admin/products" class="btn btn-secondary">取消</a>
+        </form>
+    </div>
+</body>
+</html>

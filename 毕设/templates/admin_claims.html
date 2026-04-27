@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>理赔管理 | 后台</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand">理赔管理</span>
+            <div class="navbar-nav ms-auto">
+                <a href="/admin/dashboard" class="nav-link">仪表盘</a>
+                <a href="/admin/logout" class="nav-link text-danger">退出</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2>理赔申请列表</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>保单号</th>
+                        <th>产品名称</th>
+                        <th>申请金额(元)</th>
+                        <th>理赔原因</th>
+                        <th>状态</th>
+                        <th>申请时间</th>
+                        <th>审核备注</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in claims %}
+                    <tr>
+                        <td>{{ c.id }}</td>
+                        <td>{{ c.username }}</td>
+                        <td>{{ c.policy_no }}</td>
+                        <td>{{ c.product_name }}</td>
+                        <td>{{ c.claim_amount }}</td>
+                        <td>{{ c.reason[:50] }}{% if c.reason|length > 50 %}...{% endif %}</td>
+                        <td>
+                            {% if c.status == '待审核' %}
+                            <span class="badge bg-warning text-dark">待审核</span>
+                            {% elif c.status == '已通过' %}
+                            <span class="badge bg-success">已通过</span>
+                            {% elif c.status == '已拒绝' %}
+                            <span class="badge bg-danger">已拒绝</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ c.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ c.apply_time }}</td>
+                        <td>{{ c.review_remark or '-' }}</td>
+                        <td>
+                            <!-- 查看详情按钮 -->
+                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailModal"
+                                data-id="{{ c.id }}"
+                                data-username="{{ c.username }}"
+                                data-policy_no="{{ c.policy_no }}"
+                                data-product_name="{{ c.product_name }}"
+                                data-claim_amount="{{ c.claim_amount }}"
+                                data-reason="{{ c.reason }}"
+                                data-status="{{ c.status }}"
+                                data-apply_time="{{ c.apply_time }}"
+                                data-review_remark="{{ c.review_remark or '' }}"
+                                data-insured_name="{{ c.insured_name }}"
+                                data-insured_id_card="{{ c.insured_id_card }}"
+                                data-contact="{{ c.contact }}"
+                                data-start_date="{{ c.start_date }}"
+                                data-end_date="{{ c.end_date }}"
+                                data-premium="{{ c.premium }}">
+                                查看详情
+                            </button>
+                            {% if c.status == '待审核' %}
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal{{ c.id }}">审核</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <!-- 审核模态框（仅待审核状态） -->
+                    {% if c.status == '待审核' %}
+                    <div class="modal fade" id="reviewModal{{ c.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post" action="/admin/claim/review/{{ c.id }}">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">审核理赔申请 #{{ c.id }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p><strong>用户：</strong> {{ c.username }}</p>
+                                        <p><strong>保单号：</strong> {{ c.policy_no }}</p>
+                                        <p><strong>产品：</strong> {{ c.product_name }}</p>
+                                        <p><strong>申请金额：</strong> {{ c.claim_amount }} 元</p>
+                                        <p><strong>理赔原因：</strong> {{ c.reason }}</p>
+                                        <div class="mb-3">
+                                            <label class="form-label">审核结果</label>
+                                            <select name="status" class="form-select" required>
+                                                <option value="已通过">通过</option>
+                                                <option value="已拒绝">拒绝</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">审核备注</label>
+                                            <textarea name="remark" class="form-control" rows="2"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                        <button type="submit" class="btn btn-primary">提交审核</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <a href="/admin/dashboard" class="btn btn-secondary">返回仪表盘</a>
+    </div>
+
+    <!-- 详情模态框（全局） -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">理赔详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>理赔ID：</strong> <span id="detail_id"></span></p>
+                            <p><strong>用户名：</strong> <span id="detail_username"></span></p>
+                            <p><strong>保单号：</strong> <span id="detail_policy_no"></span></p>
+                            <p><strong>产品名称：</strong> <span id="detail_product_name"></span></p>
+                            <p><strong>申请金额：</strong> <span id="detail_claim_amount"></span> 元</p>
+                            <p><strong>理赔原因：</strong> <span id="detail_reason"></span></p>
+                            <p><strong>状态：</strong> <span id="detail_status"></span></p>
+                            <p><strong>申请时间：</strong> <span id="detail_apply_time"></span></p>
+                            <p><strong>审核备注：</strong> <span id="detail_review_remark"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>被保险人姓名：</strong> <span id="detail_insured_name"></span></p>
+                            <p><strong>被保险人身份证号：</strong> <span id="detail_insured_id_card"></span></p>
+                            <p><strong>联系电话：</strong> <span id="detail_contact"></span></p>
+                            <p><strong>保单生效日：</strong> <span id="detail_start_date"></span></p>
+                            <p><strong>保单到期日：</strong> <span id="detail_end_date"></span></p>
+                            <p><strong>已缴保费：</strong> <span id="detail_premium"></span> 元</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 填充详情模态框数据
+        const detailModal = document.getElementById('detailModal');
+        if (detailModal) {
+            detailModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('detail_id').innerText = button.getAttribute('data-id');
+                document.getElementById('detail_username').innerText = button.getAttribute('data-username');
+                document.getElementById('detail_policy_no').innerText = button.getAttribute('data-policy_no');
+                document.getElementById('detail_product_name').innerText = button.getAttribute('data-product_name');
+                document.getElementById('detail_claim_amount').innerText = button.getAttribute('data-claim_amount');
+                document.getElementById('detail_reason').innerText = button.getAttribute('data-reason');
+                document.getElementById('detail_status').innerText = button.getAttribute('data-status');
+                document.getElementById('detail_apply_time').innerText = button.getAttribute('data-apply_time');
+                document.getElementById('detail_review_remark').innerText = button.getAttribute('data-review_remark') || '暂无';
+                document.getElementById('detail_insured_name').innerText = button.getAttribute('data-insured_name');
+                document.getElementById('detail_insured_id_card').innerText = button.getAttribute('data-insured_id_card');
+                document.getElementById('detail_contact').innerText = button.getAttribute('data-contact');
+                document.getElementById('detail_start_date').innerText = button.getAttribute('data-start_date') || '未知';
+                document.getElementById('detail_end_date').innerText = button.getAttribute('data-end_date') || '未知';
+                document.getElementById('detail_premium').innerText = button.getAttribute('data-premium');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服咨询 | 运动宝</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #eef2f9 0%, #e0e8f0 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+        }
+        /* 顶部导航栏（与首页统一） */
+        .top-nav {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.8rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #2c5282, #3182ce);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: #3182ce;
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .btn-outline-primary {
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
+        }
+        /* 主聊天区域 */
+        .chat-wrapper {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+            /* 新增：确保聊天容器的层级上下文不影响子元素 */
+            position: relative;
+            z-index: 1;
+        }
+        /* 消息列表区域 */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: #f8fafc;
+        }
+        /* 消息项 */
+        .message-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            max-width: 75%;
+        }
+        .message-item.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #c4c4c4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
+        }
+        .avatar.user {
+            background: #2c5282;
+        }
+        .avatar.admin {
+            background: #f59e0b;
+        }
+        .bubble {
+            background: white;
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            position: relative;
+            max-width: 100%;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .message-item.user .bubble {
+            background: #d9f0ec;
+            border-radius: 1rem 1rem 0.25rem 1rem;
+        }
+        .message-item.admin .bubble {
+            background: white;
+            border-radius: 1rem 1rem 1rem 0.25rem;
+        }
+        .message-text {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .message-text a {
+            color: #2c5282;
+            text-decoration: underline;
+        }
+        .message-time {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 0.3rem;
+            text-align: right;
+        }
+        /* 输入区域 */
+        .chat-input {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            /* 保留relative，但移除行内样式（统一管理） */
+            position: relative;
+            /* 新增：确保输入区层级高于消息区 */
+            z-index: 2;
+        }
+        .emoji-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0 0.5rem;
+            color: #666;
+            transition: 0.2s;
+        }
+        .emoji-btn:hover {
+            color: #2c5282;
+            transform: scale(1.1);
+        }
+        .chat-input input {
+            flex: 1;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            border-radius: 2rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        .chat-input input:focus {
+            border-color: #3182ce;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(49,130,206,0.2);
+        }
+        .chat-input button {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.6rem 1.2rem;
+            color: white;
+            font-weight: 600;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .chat-input button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+        /* 表情面板 - 核心修复 */
+        .emoji-panel {
+            position: absolute;
+            bottom: calc(100% + 10px); /* 修复：改为相对输入框顶部向上偏移，避免遮挡 */
+            left: 1.5rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); /* 增强阴影，提升层次感 */
+            padding: 0.8rem;
+            width: 300px;
+            display: none;
+            z-index: 9999; /* 提升层级，确保不被任何元素遮挡 */
+            border: 1px solid #e2e8f0;
+            /* 新增：防止面板超出可视区域 */
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        /* 新增：响应式适配表情面板位置 */
+        @media (max-width: 768px) {
+            .emoji-panel {
+                left: 0.5rem;
+                width: calc(100% - 1rem); /* 适配手机宽度 */
+            }
+        }
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 6px;
+        }
+        .emoji-grid span {
+            font-size: 1.3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.1s;
+            padding: 4px;
+            border-radius: 6px; /* 提前设置圆角，hover时无跳动 */
+        }
+        .emoji-grid span:hover {
+            transform: scale(1.2);
+            background: #f0f0f0;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+        }
+        .loading-bubble {
+            background: white;
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            color: #999;
+            font-size: 0.9rem;
+            animation: pulse 1.2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0.8rem 1rem;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+            .chat-wrapper {
+                margin: 1rem;
+                padding: 0;
+                height: calc(100vh - 100px);
+            }
+            .message-item {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏（与首页一致） -->
+    <div class="top-nav">
+        <a href="/" class="logo">
+            <i class="fas fa-shield-alt me-2"></i>运动宝
+        </a>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/insurance/products">保险商城</a>
+            <a href="/calc">运动评估</a>
+            {% if session.username %}
+                <div class="dropdown">
+                    <a href="#" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i>{{ session.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/my">个人中心</a></li>
+                        <li><a class="dropdown-item" href="/profile">编辑资料</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout">退出登录</a></li>
+                    </ul>
+                </div>
+            {% else %}
+                <div class="user-menu">
+                    <a href="/login" class="btn btn-outline-primary">登录</a>
+                    <a href="/register" class="btn btn-primary">注册</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 聊天区域 -->
+    <div class="chat-wrapper">
+        <div class="chat-messages" id="messageList">
+            {% if messages %}
+                {% for msg in messages %}
+                <div class="message-item {% if msg.is_admin_reply %}admin{% else %}user{% endif %}" data-id="{{ msg.id }}">
+                    <div class="avatar {% if msg.is_admin_reply %}admin{% else %}user{% endif %}">
+                        {% if msg.is_admin_reply %}
+                            <i class="fas fa-headset"></i>
+                        {% else %}
+                            <i class="fas fa-user"></i>
+                        {% endif %}
+                    </div>
+                    <div class="bubble">
+                        <div class="message-text">{{ msg.content|urlize(40) }}</div>
+                        <div class="message-time">{{ msg.create_time.strftime('%H:%M') }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-comment-dots fa-2x"></i>
+                    <p>暂无消息，开始咨询吧</p>
+                </div>
+            {% endif %}
+        </div>
+        <div class="chat-input">
+            <button type="button" class="emoji-btn" id="emojiToggleBtn">
+                <i class="far fa-smile"></i>
+            </button>
+            <input type="text" id="msgInput" placeholder="输入消息..." autocomplete="off">
+            <button id="sendBtn"><i class="fas fa-paper-plane"></i> 发送</button>
+            <div id="emojiPanel" class="emoji-panel">
+                <div class="emoji-grid">
+                    <span>😀</span><span>😁</span><span>😂</span><span>😊</span>
+                    <span>😍</span><span>😎</span><span>😭</span><span>😡</span>
+                    <span>👍</span><span>🎉</span><span>❤️</span><span>🔥</span>
+                    <span>💪</span><span>👏</span><span>🙏</span><span>✨</span>
+                    <span>🐱</span><span>🍕</span><span>⚽</span><span>🏀</span>
+                    <span>💯</span><span>😴</span><span>🤔</span><span>🤗</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM 元素
+        const msgContainer = document.getElementById('messageList');
+        const msgInput = document.getElementById('msgInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const emojiBtn = document.getElementById('emojiToggleBtn');
+        const emojiPanel = document.getElementById('emojiPanel');
+
+        function getCurrentTime() {
+            const now = new Date();
+            return `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        }
+
+        function scrollToBottom() {
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+        }
+
+        function addMessage(content, isAdminReply, timestamp = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message-item ${isAdminReply ? 'admin' : 'user'}`;
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = `avatar ${isAdminReply ? 'admin' : 'user'}`;
+            const icon = document.createElement('i');
+            icon.className = isAdminReply ? 'fas fa-headset' : 'fas fa-user';
+            avatarDiv.appendChild(icon);
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'bubble';
+            const textDiv = document.createElement('div');
+            textDiv.className = 'message-text';
+            textDiv.textContent = content;
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = timestamp || getCurrentTime();
+            bubbleDiv.appendChild(textDiv);
+            bubbleDiv.appendChild(timeDiv);
+            messageDiv.appendChild(avatarDiv);
+            messageDiv.appendChild(bubbleDiv);
+            const emptyDiv = msgContainer.querySelector('.empty-state');
+            if (emptyDiv) emptyDiv.remove();
+            msgContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        let loadingMsgElement = null;
+        function showLoading() {
+            if (loadingMsgElement) return;
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message-item admin';
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'avatar admin';
+            avatarDiv.innerHTML = '<i class="fas fa-headset"></i>';
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'loading-bubble';
+            bubbleDiv.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> 对方正在输入...';
+            loadingDiv.appendChild(avatarDiv);
+            loadingDiv.appendChild(bubbleDiv);
+            msgContainer.appendChild(loadingDiv);
+            loadingMsgElement = loadingDiv;
+            scrollToBottom();
+        }
+
+        function hideLoading() {
+            if (loadingMsgElement) {
+                loadingMsgElement.remove();
+                loadingMsgElement = null;
+            }
+        }
+
+        async function sendMessage() {
+            const content = msgInput.value.trim();
+            if (!content) return;
+            msgInput.value = '';
+            addMessage(content, false);
+            showLoading();
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: content }),
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                hideLoading();
+                if (response.ok && result.code === 0 && result.data && result.data.reply) {
+                    addMessage(result.data.reply, true);
+                } else {
+                    addMessage('抱歉，服务暂时不可用，请稍后再试。', true);
+                }
+            } catch (error) {
+                console.error('发送失败:', error);
+                hideLoading();
+                addMessage('网络异常，请检查连接后重试。', true);
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        msgInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // 表情选择 - 优化交互逻辑
+        if (emojiBtn && emojiPanel && msgInput) {
+            // 切换表情面板显示/隐藏
+            emojiBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isVisible = emojiPanel.style.display === 'block';
+                emojiPanel.style.display = isVisible ? 'none' : 'block';
+                // 新增：显示时做边界检测，防止超出屏幕
+                if (!isVisible) {
+                    const panelRect = emojiPanel.getBoundingClientRect();
+                    if (panelRect.top < 0) {
+                        emojiPanel.style.bottom = 'calc(100% + 10px)';
+                        emojiPanel.style.top = 'auto';
+                    }
+                }
+            });
+
+            // 选择表情插入输入框
+            const emojis = emojiPanel.querySelectorAll('.emoji-grid span');
+            emojis.forEach(emoji => {
+                emoji.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const symbol = emoji.textContent.trim();
+                    const start = msgInput.selectionStart;
+                    const end = msgInput.selectionEnd;
+                    // 插入表情到光标位置
+                    msgInput.value =
+                        msgInput.value.substring(0, start) +
+                        symbol +
+                        msgInput.value.substring(end);
+                    // 重置光标位置
+                    msgInput.selectionStart = msgInput.selectionEnd = start + symbol.length;
+                    msgInput.focus();
+                    emojiPanel.style.display = 'none';
+                });
+            });
+
+            // 点击页面其他区域关闭表情面板
+            document.addEventListener('click', function(event) {
+                const isClickInside = emojiBtn.contains(event.target) || emojiPanel.contains(event.target);
+                if (!isClickInside) {
+                    emojiPanel.style.display = 'none';
+                }
+            });
+
+            // 按ESC键关闭表情面板
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && emojiPanel.style.display === 'block') {
+                    emojiPanel.style.display = 'none';
+                    msgInput.focus();
+                }
+            });
+        }
+
+        // 初始化滚动到底部
+        scrollToBottom();
+
+        // 处理消息中的链接
+        const allLinks = document.querySelectorAll('.message-text a');
+        allLinks.forEach(link => {
+            link.setAttribute('target', '_blank');
+            link.setAttribute('rel', 'noopener noreferrer');
+        });
+    </script>
+</body>
+</html>

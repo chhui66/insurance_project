@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>账户充值 | 运动宝</title>
+    <!-- Bootstrap 5 核心样式 -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 优雅字体 Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef2f9 0%, #e0e8f0 100%);
+            font-family: 'Inter', 'Microsoft YaHei', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 动态背景装饰 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(66, 153, 225, 0.12) 0%, rgba(66, 153, 225, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -15%;
+            left: -8%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(72, 187, 120, 0.08) 0%, rgba(72, 187, 120, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 顶部导航栏（与首页一致） */
+        .top-nav {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.8rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #2c5282, #3182ce);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #3182ce;
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .btn-outline-primary {
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
+        }
+
+        /* 主内容容器 */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 150px);
+        }
+
+        /* 充值卡片 */
+        .card {
+            max-width: 480px;
+            width: 100%;
+            border: none;
+            border-radius: 2rem;
+            background: white;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15);
+            padding: 2rem;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+        }
+        .amount-input {
+            font-size: 1.2rem;
+            padding: 0.8rem;
+            text-align: center;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        .amount-input:focus {
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+            outline: none;
+        }
+        .btn-recharge {
+            background: linear-gradient(115deg, #2f855a, #276749);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.8rem;
+            font-weight: 600;
+            color: white;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .btn-recharge:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+        .btn-secondary {
+            background-color: #64748b;
+            border: none;
+            border-radius: 2rem;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .btn-secondary:hover {
+            background-color: #475569;
+            transform: translateY(-2px);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0.8rem 1rem;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+            .main-container {
+                padding: 0 1rem;
+                min-height: auto;
+                margin: 1rem auto;
+            }
+            .card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+        <a href="/" class="logo">
+            <i class="fas fa-shield-alt me-2"></i>运动宝
+        </a>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/insurance/products">保险商城</a>
+            <a href="/calc">运动评估</a>
+            {% if session.username %}
+                <div class="dropdown">
+                    <a href="#" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i>{{ session.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/my">个人中心</a></li>
+                        <li><a class="dropdown-item" href="/profile">编辑资料</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout">退出登录</a></li>
+                    </ul>
+                </div>
+            {% else %}
+                <div class="user-menu">
+                    <a href="/login" class="btn btn-outline-primary">登录</a>
+                    <a href="/register" class="btn btn-primary">注册</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="main-container">
+        <div class="card text-center">
+            <i class="fas fa-wallet fa-3x text-primary mb-3"></i>
+            <h3>账户充值</h3>
+            <p class="text-muted">当前余额：<strong>¥{{ user.balance }}</strong></p>
+            <form method="post">
+                <div class="mb-3">
+                    <input type="number" name="amount" class="form-control amount-input" step="0.01" min="0.01" placeholder="输入充值金额" required>
+                </div>
+                <button type="submit" class="btn-recharge"><i class="fas fa-credit-card"></i> 立即充值</button>
+            </form>
+            <a href="/my" class="btn btn-secondary mt-3">返回“我的”页面</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js')
+                .then(reg => console.log('Service Worker 注册成功', reg))
+                .catch(err => console.log('Service Worker 注册失败', err));
+        }
+    </script>
+</body>
+</html>

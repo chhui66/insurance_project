@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>投保 - {{ product.name }} | 运动宝</title>
+    <!-- Bootstrap 5 核心样式 -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 优雅字体 Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f4fa 0%, #e2eaf1 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* 动态光晕背景 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(49, 130, 206, 0.08) 0%, rgba(49, 130, 206, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            left: -8%;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(72, 187, 120, 0.06) 0%, rgba(72, 187, 120, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 主卡片 */
+        .insurance-card {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.02);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .insurance-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 30px 45px -16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 头部渐变 */
+        .card-header {
+            background: linear-gradient(115deg, #2b6cb0, #1e4a76);
+            padding: 1.8rem 1rem;
+            text-align: center;
+            border-bottom: none;
+            position: relative;
+        }
+        .card-header h2 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin: 0;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card-header h2 i {
+            font-size: 1.7rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        /* 主体 */
+        .card-body {
+            padding: 2rem 2.5rem;
+        }
+
+        /* 产品详情卡片（支持图片并排） */
+        .product-detail-card {
+            background: #f8fafc;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #3182ce;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .product-image {
+            flex-shrink: 0;
+            width: 120px;
+            height: 120px;
+            background: #f1f5f9;
+            border-radius: 1rem;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-info {
+            flex: 1;
+            min-width: 200px;
+        }
+        .detail-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1e3a5f;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .detail-content {
+            color: #2d3e50;
+            line-height: 1.5;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .coverage-badge {
+            background: #eef2ff;
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            color: #2c5282;
+            margin-right: 0.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+        /* 风险等级徽章 */
+        .risk-badge {
+            background: linear-gradient(135deg, #fff6e5, #ffefd6);
+            border-radius: 1rem;
+            padding: 0.8rem 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-left: 5px solid #f59e0b;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .risk-label {
+            font-weight: 600;
+            color: #b45309;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .risk-value {
+            background: white;
+            padding: 0.25rem 1rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            color: #f59e0b;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        /* 保费卡片 */
+        .premium-card {
+            background: #f0f9ff;
+            border-radius: 1.2rem;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.8rem;
+            text-align: center;
+            border: 1px solid #cfe3ff;
+            transition: all 0.2s;
+        }
+        .premium-card .premium-label {
+            font-size: 0.85rem;
+            color: #2c5282;
+            letter-spacing: 0.3px;
+            margin-bottom: 0.25rem;
+        }
+        .premium-card .premium-amount {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1e4a76;
+            line-height: 1.2;
+        }
+        .premium-card .premium-unit {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #5b7f9c;
+        }
+        .premium-card .premium-note {
+            font-size: 0.7rem;
+            color: #6c8eb2;
+            margin-top: 0.25rem;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #1f3a4b;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-label i {
+            color: #3182ce;
+            width: 1.2rem;
+        }
+        .form-control {
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background-color: #ffffff;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .form-control:focus {
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+            outline: none;
+            background-color: #ffffff;
+        }
+        .form-text {
+            font-size: 0.7rem;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+
+        /* 按钮组 */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.8rem;
+            flex-wrap: wrap;
+        }
+        .btn-success {
+            background: linear-gradient(115deg, #2f855a, #276749);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 8px -4px rgba(47, 133, 90, 0.3);
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(115deg, #38a169, #2f855a);
+            box-shadow: 0 8px 16px -8px rgba(47, 133, 90, 0.4);
+        }
+        .btn-secondary {
+            background-color: #64748b;
+            border: none;
+            border-radius: 2rem;
+            padding: 0.8rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #475569;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* 电脑端响应式调整 */
+        @media (min-width: 1400px) {
+            .insurance-card {
+                max-width: 1000px;
+            }
+            .card-body {
+                padding: 2.5rem 3rem;
+            }
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+            .card-body {
+                padding: 1.5rem;
+            }
+            .card-header h2 {
+                font-size: 1.4rem;
+            }
+            .risk-badge {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .premium-card .premium-amount {
+                font-size: 1.4rem;
+            }
+            .product-detail-card {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .product-image {
+                width: 100px;
+                height: 100px;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn-success, .btn-secondary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="insurance-card">
+        <div class="card-header">
+            <h2>
+                <i class="fas fa-file-contract"></i>
+                投保 {{ product.name }}
+                <i class="fas fa-shield-alt"></i>
+            </h2>
+        </div>
+        <div class="card-body">
+            <!-- 产品详情卡片（包含图片和文字） -->
+            <div class="product-detail-card">
+                <div class="product-image">
+                    <img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}"
+                         onerror="this.onerror=null; this.src='{{ url_for('static', filename='default_product.jpg') }}';">
+                </div>
+                <div class="product-info">
+                    <div class="detail-title">
+                        <i class="fas fa-info-circle"></i> 产品详情
+                    </div>
+                    <div class="detail-content">
+                        <strong>产品描述：</strong> {{ product.description }}
+                    </div>
+                    {% if product.coverage %}
+                    <div class="detail-content">
+                        <strong>保障责任：</strong><br>
+                        {% for line in product.coverage.split('\n') %}
+                            {% if line.strip() %}
+                                <span class="coverage-badge"><i class="fas fa-check-circle"></i> {{ line.strip() }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div class="detail-content text-muted small mt-2">
+                        <i class="fas fa-gavel"></i> 本产品由运动宝提供，详细条款以保险合同为准。
+                    </div>
+                </div>
+            </div>
+
+            <!-- 风险等级 -->
+            <div class="risk-badge">
+                <span class="risk-label"><i class="fas fa-chart-line"></i> 您的健康风险等级</span>
+                <span class="risk-value">{{ risk_level }}</span>
+            </div>
+
+            <!-- 保费展示区（动态更新总保费） -->
+            <div class="premium-card">
+                <div class="premium-label"><i class="fas fa-tag"></i> 预估总保费</div>
+                <div class="premium-amount" id="totalPremium">--</div>
+                <div class="premium-unit">人民币（元）</div>
+                <div class="premium-note">* 根据保障天数计算</div>
+            </div>
+
+            <!-- 温馨提示：如实填写被保险人信息 -->
+            <div class="alert alert-warning alert-dismissible fade show mb-3" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>温馨提示：</strong> 请如实填写被保险人信息，虚假信息可能导致理赔失败或合同无效。
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- 投保表单 -->
+            <form method="post">
+                <div class="form-group">
+                    <label for="insured_name" class="form-label">
+                        <i class="fas fa-user"></i> 被保险人姓名
+                    </label>
+                    <input type="text" id="insured_name" name="insured_name" class="form-control" placeholder="请填写真实姓名" required>
+                </div>
+                <div class="form-group">
+                    <label for="insured_id_card" class="form-label">
+                        <i class="fas fa-id-card"></i> 身份证号
+                    </label>
+                    <input type="text" id="insured_id_card" name="insured_id_card" class="form-control" placeholder="18位身份证号码" required>
+                </div>
+                <div class="form-group">
+                    <label for="contact" class="form-label">
+                        <i class="fas fa-phone-alt"></i> 联系方式
+                    </label>
+                    <input type="tel" id="contact" name="contact" class="form-control" placeholder="手机号 / 固定电话" required>
+                    <div class="form-text">用于接收保单通知及理赔联系</div>
+                </div>
+                <div class="form-group">
+                    <label for="days" class="form-label">
+                        <i class="fas fa-calendar-alt"></i> 保障天数（1-365）
+                    </label>
+                    <input type="number" id="days" name="days" class="form-control" step="1" min="1" max="365" value="30" required>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check-circle"></i> 确认投保
+                    </button>
+                    <a href="/insurance/products" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> 返回
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const daysInput = document.getElementById('days');
+        const totalPremiumSpan = document.getElementById('totalPremium');
+
+        let dailyRate = {{ premium }};
+        if (typeof dailyRate !== 'number') {
+            dailyRate = parseFloat(dailyRate);
+        }
+        if (isNaN(dailyRate)) {
+            dailyRate = 0;
+            console.warn('日保费无效，已设为0');
+        }
+
+        function updateTotalPremium() {
+            if (!daysInput || !totalPremiumSpan) return;
+            let days = parseInt(daysInput.value);
+            if (isNaN(days) || days < 1) days = 30;
+            const total = dailyRate * days;
+            totalPremiumSpan.innerText = total.toFixed(2);
+        }
+
+        if (daysInput) {
+            daysInput.addEventListener('input', updateTotalPremium);
+            updateTotalPremium();
+        } else {
+            console.error('未找到天数输入框');
+        }
+    </script>
+</body>
+</html>

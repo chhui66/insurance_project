@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>我的运动健康报告 | 运动宝</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(145deg, #eef2f9 0%, #e0e8f0 100%);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(66, 153, 225, 0.12) 0%, rgba(66, 153, 225, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -15%;
+            left: -8%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(72, 187, 120, 0.08) 0%, rgba(72, 187, 120, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .top-nav {
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 0.8rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo { font-size: 1.5rem; font-weight: 700; background: linear-gradient(120deg,#2c5282,#3182ce); background-clip: text; -webkit-background-clip: text; color: transparent; text-decoration: none; }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+        .nav-links a { color: #4a5568; text-decoration: none; font-weight: 500; transition: 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: #3182ce; }
+        .user-menu { display: flex; align-items: center; gap: 1rem; }
+        .btn-outline-primary { border-radius: 2rem; padding: 0.4rem 1.2rem; }
+        .btn-primary { background: linear-gradient(135deg,#3182ce,#2c5282); border: none; border-radius: 2rem; padding: 0.4rem 1.2rem; }
+        .main-container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; position: relative; z-index: 2; }
+        .report-card { background: white; border-radius: 2rem; overflow: hidden; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); }
+        .report-header { background: linear-gradient(135deg, #2c5282 0%, #3182ce 100%); padding: 2rem; color: white; }
+        .report-header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .report-header p { opacity: 0.9; margin-bottom: 0; font-size: 0.9rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: -1.5rem 1.5rem 1.5rem 1.5rem; }
+        .stat-card { background: white; border-radius: 1rem; padding: 1rem; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.05); transition: transform 0.2s; border: 1px solid rgba(0,0,0,0.03); }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15); }
+        .stat-number { font-size: 2rem; font-weight: 800; color: #3182ce; line-height: 1.2; }
+        .stat-label { font-size: 0.8rem; color: #6c757d; margin-top: 0.25rem; }
+        .report-content { padding: 0 1.8rem 2rem 1.8rem; }
+        .section-title { font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; border-left: 4px solid #3182ce; padding-left: 0.8rem; color: #1e2f3e; margin-top: 1.8rem; }
+        .type-list { list-style: none; padding: 0; margin: 0; }
+        .type-item { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #edf2f7; }
+        .type-name { font-weight: 500; width: 100px; }
+        .type-stats { flex: 1; margin: 0 1rem; }
+        .progress { height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden; }
+        .progress-bar { background: linear-gradient(90deg, #3182ce, #5a9eff); border-radius: 4px; }
+        .type-values { display: flex; justify-content: space-between; font-size: 0.75rem; color: #6c757d; margin-top: 4px; }
+        .advice-box { background: #f8fafc; border-radius: 1rem; padding: 1rem 1.2rem; margin-top: 1rem; }
+        .strength-badge { background: #e9ecef; padding: 0.2rem 0.8rem; border-radius: 1rem; font-size: 0.7rem; display: inline-block; margin-left: 0.5rem; }
+        .bmi-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 600; margin-left: 0.5rem; background: #e9ecef; }
+        .bmi-偏瘦 { background: #bae6fd; color: #0369a1; }
+        .bmi-正常 { background: #bbf7d0; color: #15803d; }
+        .bmi-超重 { background: #fed7aa; color: #b45309; }
+        .bmi-肥胖 { background: #fecaca; color: #b91c1c; }
+        .chart-bar-container { display: flex; align-items: flex-end; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+        .week-bar { flex: 1; text-align: center; }
+        .bar { background: linear-gradient(180deg, #3182ce, #5a9eff); width: 100%; min-width: 30px; border-radius: 6px 6px 0 0; transition: height 0.3s; }
+        .week-label { font-size: 0.7rem; margin-top: 0.5rem; color: #6c757d; }
+        .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.8rem; margin-top: 1rem; }
+        .tip-card { background: #f8fafc; border-radius: 0.8rem; padding: 0.8rem; font-size: 0.85rem; border-left: 3px solid #3182ce; }
+        .action-buttons { margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        @media (max-width: 768px) {
+            .top-nav { flex-direction: column; gap: 0.5rem; padding: 0.8rem 1rem; }
+            .nav-links { flex-wrap: wrap; justify-content: center; gap: 1rem; }
+            .main-container { padding: 0 1rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.8rem; margin: -1rem 1rem 1rem 1rem; }
+            .report-header h1 { font-size: 1.4rem; }
+            .section-title { font-size: 1.1rem; }
+            .type-name { width: 80px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <a href="/" class="logo"><i class="fas fa-shield-alt me-2"></i>运动宝</a>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/insurance/products">保险商城</a>
+            <a href="/calc">运动评估</a>
+            {% if session.username %}
+                <div class="dropdown">
+                    <a href="#" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-user me-1"></i>{{ session.username }}</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/my">个人中心</a></li>
+                        <li><a class="dropdown-item" href="/profile">编辑资料</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout">退出登录</a></li>
+                    </ul>
+                </div>
+            {% else %}
+                <div class="user-menu"><a href="/login" class="btn btn-outline-primary">登录</a><a href="/register" class="btn btn-primary">注册</a></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="report-card">
+            <div class="report-header">
+                <h1><i class="fas fa-chart-line me-2"></i>运动健康报告</h1>
+                <p><i class="far fa-calendar-alt me-1"></i>统计周期：最近30天 &nbsp;|&nbsp; 生成时间：{{ generated_time }}</p>
+            </div>
+
+            <!-- 核心数据卡片 -->
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-number">{{ total_duration }}</div><div class="stat-label">总时长(分钟)</div></div>
+                <div class="stat-card"><div class="stat-number">{{ total_calories }}</div><div class="stat-label">总卡路里(kcal)</div></div>
+                <div class="stat-card"><div class="stat-number">{{ sport_days }}</div><div class="stat-label">运动天数</div></div>
+                <div class="stat-card"><div class="stat-number">{{ sport_count }}</div><div class="stat-label">运动次数</div></div>
+            </div>
+
+            <div class="report-content">
+                <!-- 运动趋势（周分布） -->
+                {% if weekly_items %}
+                <div class="section-title"><i class="fas fa-chart-line me-2"></i>运动趋势（周时长）</div>
+                <div class="chart-bar-container">
+                    {% for label, value in weekly_items %}
+                    <div class="week-bar">
+                        <div class="bar" style="height: {{ (value / weekly_max * 80)|int + 30 }}px;"></div>
+                        <div class="week-label">{{ label }}</div>
+                        <div class="week-label">{{ value }}分钟</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- 运动类型分布 + 强度分析 -->
+                <div class="section-title"><i class="fas fa-chart-pie me-2"></i>运动类型与强度分析</div>
+                {% if type_stats %}
+                    <ul class="type-list">
+                        {% for sport, stats in type_stats.items() %}
+                        {% set total_duration_all = total_duration %}
+                        {% set percent = (stats.duration / total_duration_all * 100)|round(0) if total_duration_all > 0 else 0 %}
+                        <li class="type-item">
+                            <div class="type-name">{{ sport }}
+                                <span class="strength-badge">
+                                    {% if stats.intensity == '中' %}中等强度{% else %}高强度{% endif %}
+                                </span>
+                            </div>
+                            <div class="type-stats">
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: {{ percent }}%;"></div>
+                                </div>
+                                <div class="type-values">
+                                    <span>{{ stats.duration }}分钟</span>
+                                    <span>{{ stats.calorie }}kcal</span>
+                                    <span>{{ stats.count }}次</span>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="advice-box">
+                        <i class="fas fa-dumbbell me-2"></i> <strong>强度占比</strong>：中等强度运动占 {{ moderate_percent }}%，高强度运动占 {{ high_percent }}%。
+                        {% if high_percent > 50 %}高强度运动比例偏高，注意运动恢复与补水。{% else %}中等强度运动为主，建议适当增加高强度训练提升体能。{% endif %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center">暂无运动记录，快去运动吧！</p>
+                {% endif %}
+
+                <!-- 身体指标分析 -->
+                <div class="section-title"><i class="fas fa-heartbeat me-2"></i>身体指标分析</div>
+                <div class="advice-box">
+                    {% if bmi %}
+                        <p><strong>BMI指数：</strong> {{ bmi }} <span class="bmi-badge bmi-{{ bmi_status }}">{{ bmi_status }}</span></p>
+                        <p><strong>基础代谢率(BMR)：</strong> {{ bmr }} kcal/天</p>
+                        {% if target_weight and weight_diff %}
+                            <p><strong>健康体重建议：</strong> 目标体重 {{ target_weight }} kg，目前 {{ '超重' if weight_diff > 0 else '偏瘦' }} {{ weight_diff|abs|round(1) }} kg。
+                            {% if weight_diff > 0 %}建议每周减重0.5kg，配合饮食与运动。{% elif weight_diff < 0 %}建议增加营养摄入，结合力量训练增肌。{% else %}当前体重非常理想，继续保持！{% endif %}</p>
+                        {% endif %}
+                    {% else %}
+                        <p>请完善个人资料（身高、体重、年龄、性别），获取更精准的身体指标分析。</p>
+                        <a href="/profile" class="btn btn-sm btn-outline-primary mt-2">去完善资料</a>
+                    {% endif %}
+                    <p><strong>运动效率：</strong> 平均每次运动 {{ avg_duration_per_session }} 分钟，每日平均运动 {{ avg_duration_per_day }} 分钟。{% if avg_duration_per_day < 30 %}建议增加每日运动量至30分钟以上。{% else %}运动量充足，继续保持！{% endif %}</p>
+                </div>
+
+                <!-- 保险关联建议 -->
+                <div class="section-title"><i class="fas fa-shield-alt me-2"></i>保险保障建议</div>
+                <div class="advice-box">
+                    <p><i class="fas fa-chart-line me-1"></i> 当前健康风险等级：<strong>{{ risk_level }}</strong></p>
+                    <p>{{ insurance_suggestion }}</p>
+                    <a href="/insurance/products" class="btn btn-sm btn-primary mt-2">查看推荐产品 <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <!-- 运动目标完成情况 -->
+                <div class="section-title"><i class="fas fa-flag-checkered me-2"></i>月度目标追踪</div>
+                <div class="advice-box">
+                    <p>{{ progress_message }}</p>
+                    <div class="progress mt-2" style="height: 10px;">
+                        <div class="progress-bar" style="width: {{ progress_percent }}%;"></div>
+                    </div>
+                </div>
+
+                <!-- 健康贴士 -->
+                <div class="section-title"><i class="fas fa-lightbulb me-2"></i>健康小贴士</div>
+                <div class="tips-grid">
+                    {% for tip in tips %}
+                    <div class="tip-card"><i class="fas fa-check-circle text-primary me-1"></i> {{ tip }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- 操作按钮 -->
+                <div class="action-buttons">
+                    <a href="/my" class="btn btn-primary"><i class="fas fa-arrow-left"></i> 返回个人中心</a>
+                    <a href="/calc" class="btn btn-outline-primary"><i class="fas fa-calculator"></i> 运动评估</a>
+                    <button onclick="window.print();" class="btn btn-outline-secondary"><i class="fas fa-print"></i> 打印报告</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js').catch(console.log);
+        }
+    </script>
+</body>
+</html>

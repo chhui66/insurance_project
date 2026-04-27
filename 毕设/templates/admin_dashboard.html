@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 | 运动宝</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f4fa 0%, #e2eaf1 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            position: relative;
+        }
+        /* 动态光晕背景 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(49, 130, 206, 0.08) 0%, rgba(49, 130, 206, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -15%;
+            left: -8%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(72, 187, 120, 0.06) 0%, rgba(72, 187, 120, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        /* 欢迎卡片 */
+        .welcome-card {
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(2px);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .welcome-text h2 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 0.25rem;
+            background: linear-gradient(120deg, #2c5282, #3182ce);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .welcome-text p {
+            color: #5b7a9a;
+            margin: 0;
+        }
+        .admin-badge {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            color: white;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* 统计卡片 */
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            display: block;
+            color: inherit;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.15);
+            text-decoration: none;
+        }
+        .card-inner {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .stat-info h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #5b7a9a;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1e2f3e;
+            line-height: 1;
+        }
+        .stat-icon {
+            font-size: 3rem;
+            opacity: 0.7;
+        }
+        /* 不同颜色卡片头部装饰 */
+        .card-primary .stat-icon { color: #3182ce; }
+        .card-success .stat-icon { color: #38a169; }
+        .card-warning .stat-icon { color: #f59e0b; }
+        /* 功能列表 */
+        .action-list {
+            background: rgba(255,255,255,0.96);
+            border-radius: 1.5rem;
+            padding: 1rem 0;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.6);
+            margin-bottom: 1.5rem;
+        }
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #1e2f3e;
+            border-left: 3px solid transparent;
+        }
+        .action-item:hover {
+            background: #f8fafd;
+            border-left-color: #3182ce;
+            transform: translateX(5px);
+        }
+        .action-item i {
+            width: 2rem;
+            font-size: 1.2rem;
+            color: #3182ce;
+        }
+        .action-item span {
+            flex: 1;
+            font-weight: 500;
+        }
+        .action-item.text-danger i {
+            color: #e53e3e;
+        }
+        .action-item.text-danger:hover {
+            border-left-color: #e53e3e;
+            background: #fff5f5;
+        }
+        .logout-item {
+            border-top: 1px solid #eef2f8;
+            margin-top: 0.5rem;
+        }
+
+        /* 公告管理卡片 */
+        .announcement-card {
+            background: rgba(255,255,255,0.96);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.6);
+            margin-bottom: 1.5rem;
+        }
+        .announcement-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #eef2f8;
+            padding-bottom: 0.75rem;
+        }
+        .announcement-header i {
+            font-size: 1.4rem;
+            color: #f59e0b;
+        }
+        .announcement-header h4 {
+            margin: 0;
+            font-weight: 700;
+            color: #1e2f3e;
+        }
+        .announcement-preview {
+            background: #fefce8;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #2d3748;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .announcement-preview p {
+            margin-bottom: 0;
+        }
+        .form-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .btn-save {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            color: white;
+        }
+        .btn-save:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #e9ecef;
+            border-radius: 2rem;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-active {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+        .status-inactive {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .welcome-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            .stat-number {
+                font-size: 2rem;
+            }
+            .stat-icon {
+                font-size: 2.5rem;
+            }
+            .action-item {
+                padding: 0.8rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 欢迎卡片 -->
+        <div class="welcome-card">
+            <div class="welcome-text">
+                <h2>管理员后台</h2>
+                <p><i class="fas fa-calendar-alt"></i> 欢迎回来，{{ session.admin_name }} · 管理运动宝</p>
+            </div>
+            <div class="admin-badge">
+                <i class="fas fa-user-shield"></i> 超级管理员
+            </div>
+        </div>
+
+        <!-- 统计卡片区域 -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <a href="/admin/products" class="stat-card card-primary">
+                    <div class="card-inner">
+                        <div class="stat-info">
+                            <h5><i class="fas fa-boxes"></i> 保险产品</h5>
+                            <div class="stat-number">{{ total_products }}</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-umbrella"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="/admin/policies" class="stat-card card-success">
+                    <div class="card-inner">
+                        <div class="stat-info">
+                            <h5><i class="fas fa-file-contract"></i> 用户保单</h5>
+                            <div class="stat-number">{{ total_policies }}</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="/admin/claims" class="stat-card card-warning">
+                    <div class="card-inner">
+                        <div class="stat-info">
+                            <h5><i class="fas fa-hand-holding-heart"></i> 理赔申请</h5>
+                            <div class="stat-number">{{ total_claims }}</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 功能列表 -->
+        <div class="action-list">
+            <a href="/admin/users" class="action-item">
+                <i class="fas fa-users"></i>
+                <span>用户管理</span>
+                <i class="fas fa-chevron-right" style="font-size: 0.8rem; opacity: 0.5;"></i>
+            </a>
+            <a href="/admin/products" class="action-item">
+                <i class="fas fa-boxes"></i>
+                <span>产品管理</span>
+                <i class="fas fa-chevron-right" style="font-size: 0.8rem; opacity: 0.5;"></i>
+            </a>
+            <a href="/admin/messages" class="action-item">
+                <i class="fas fa-headset"></i>
+                <span>客服消息管理</span>
+                <i class="fas fa-chevron-right" style="font-size: 0.8rem; opacity: 0.5;"></i>
+            </a>
+            <div class="logout-item">
+                <a href="/admin/logout" class="action-item text-danger">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>退出登录</span>
+                    <i class="fas fa-chevron-right" style="font-size: 0.8rem; opacity: 0.5;"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 公告管理区块 -->
+        <div class="announcement-card">
+            <div class="announcement-header">
+                <i class="fas fa-bullhorn"></i>
+                <h4>首页公告管理</h4>
+                {% if announcement and announcement.is_active %}
+                    <span class="status-badge status-active"><i class="fas fa-check-circle"></i> 已启用</span>
+                {% elif announcement and not announcement.is_active %}
+                    <span class="status-badge status-inactive"><i class="fas fa-ban"></i> 已停用</span>
+                {% else %}
+                    <span class="status-badge status-inactive"><i class="fas fa-ban"></i> 暂无公告</span>
+                {% endif %}
+            </div>
+
+            <form method="post" action="/admin/announcement/update">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">公告内容（支持简单 HTML）</label>
+                    <textarea class="form-control" name="content" rows="4" placeholder="例如：&lt;strong&gt;新春活动&lt;/strong&gt; 运动保险全场8折！" style="border-radius: 1rem;">{{ announcement.content if announcement else '' }}</textarea>
+                    <div class="form-text">支持 <code>&lt;strong&gt;</code>、<code>&lt;br&gt;</code>、<code>&lt;a&gt;</code> 等基础标签。</div>
+                </div>
+                <div class="form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="on" {% if announcement and announcement.is_active %}checked{% endif %}>
+                    <label class="form-check-label" for="is_active">启用公告（在首页显示）</label>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn-save"><i class="fas fa-save"></i> 保存公告</button>
+                </div>
+            </form>
+
+            {% if announcement and announcement.content %}
+                <div class="mt-3">
+                    <hr>
+                    <div class="fw-semibold mb-2">预览效果：</div>
+                    <div class="announcement-preview">
+                        {{ announcement.content|safe }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js')
+                .then(reg => console.log('Service Worker 注册成功', reg))
+                .catch(err => console.log('Service Worker 注册失败', err));
+        }
+    </script>
+</body>
+</html>

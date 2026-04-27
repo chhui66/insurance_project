@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品管理 | 运动宝</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f4fa 0%, #e2eaf1 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .page-header {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .page-header h2 {
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(120deg, #2c5282, #3182ce);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.5rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+        .search-bar {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .btn-warning-custom {
+            background: #f59e0b;
+            border: none;
+            border-radius: 2rem;
+            padding: 0.25rem 1rem;
+            font-size: 0.875rem;
+        }
+        .btn-danger-custom {
+            background: #e53e3e;
+            border: none;
+            border-radius: 2rem;
+            padding: 0.25rem 1rem;
+            font-size: 0.875rem;
+        }
+        .table {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        .table th {
+            background-color: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 600;
+        }
+        .product-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-active {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+        .status-inactive {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        .action-buttons a {
+            margin: 0 4px;
+        }
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            color: #6c757d;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h2><i class="fas fa-boxes me-2"></i> 产品管理</h2>
+            <div>
+                <a href="/admin/dashboard" class="btn btn-secondary me-2">
+                    <i class="fas fa-arrow-left"></i> 返回仪表盘
+                </a>
+                <a href="/admin/product/add" class="btn btn-primary-custom">
+                    <i class="fas fa-plus"></i> 添加产品
+                </a>
+            </div>
+        </div>
+
+        <!-- 搜索栏 -->
+        <div class="search-bar">
+            <div class="input-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="按产品名称或描述搜索...">
+                <button class="btn btn-primary" type="button" id="searchBtn">
+                    <i class="fas fa-search"></i> 搜索
+                </button>
+            </div>
+            <div class="mt-2">
+                <small class="text-muted">支持按产品名称或描述实时过滤</small>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="productTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>图片</th>
+                        <th>名称</th>
+                        <th>类别</th>
+                        <th>保费(元/天)</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr data-name="{{ p.name }}" data-description="{{ p.description }}" data-category="{{ p.category }}">
+                        <td>{{ p.id }}</td>
+                        <td>
+                            {% if p.image %}
+                                <img src="{{ url_for('static', filename=p.image) }}" class="product-img" alt="{{ p.name }}">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='default_product.jpg') }}" class="product-img" alt="默认图片">
+                            {% endif %}
+                        </td>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.category }}</td>
+                        <td>¥{{ p.premium_base }}</td>
+                        <td>
+                            <span class="status-badge {{ 'status-active' if p.is_active else 'status-inactive' }}">
+                                {{ '上架' if p.is_active else '下架' }}
+                            </span>
+                        </td>
+                        <td class="action-buttons">
+                            <a href="/admin/product/edit/{{ p.id }}" class="btn btn-warning-custom btn-sm">
+                                <i class="fas fa-edit"></i> 编辑
+                            </a>
+                            <a href="/admin/product/delete/{{ p.id }}" class="btn btn-danger-custom btn-sm" onclick="return confirm('确定删除产品【{{ p.name }}】吗？');">
+                                <i class="fas fa-trash-alt"></i> 删除
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr id="noDataRow">
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                            暂无产品，请点击右上角“添加产品”创建
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div id="noResults" class="no-results" style="display: none;">
+                <i class="fas fa-search fa-2x mb-2"></i><br>
+                未找到匹配的产品，请尝试其他关键词。
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const productTable = document.getElementById('productTable');
+        const noResultsDiv = document.getElementById('noResults');
+        const rows = Array.from(document.querySelectorAll('#productTable tbody tr'));
+
+        function filterProducts() {
+            const keyword = searchInput.value.trim().toLowerCase();
+            let hasMatch = false;
+
+            rows.forEach(row => {
+                // 跳过空数据提示行（无数据时）
+                if (row.id === 'noDataRow') return;
+
+                const name = row.getAttribute('data-name')?.toLowerCase() || '';
+                const description = row.getAttribute('data-description')?.toLowerCase() || '';
+                const category = row.getAttribute('data-category')?.toLowerCase() || '';
+
+                const matches = keyword === '' ||
+                                name.includes(keyword) ||
+                                description.includes(keyword) ||
+                                category.includes(keyword);
+
+                if (matches) {
+                    row.style.display = '';
+                    hasMatch = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // 控制无结果提示显示/隐藏
+            if (keyword !== '' && !hasMatch) {
+                noResultsDiv.style.display = 'block';
+            } else {
+                noResultsDiv.style.display = 'none';
+            }
+        }
+
+        // 绑定事件
+        if (searchBtn) {
+            searchBtn.addEventListener('click', filterProducts);
+            searchInput.addEventListener('keyup', function(e) {
+                filterProducts(); // 实时搜索
+            });
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js')
+                .then(reg => console.log('Service Worker 注册成功', reg))
+                .catch(err => console.log('Service Worker 注册失败', err));
+        }
+    </script>
+</body>
+</html>

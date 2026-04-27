@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>申请理赔 | 运动宝</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(145deg, #f6f9fc 0%, #eef5ff 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding-bottom: 2rem;
+        }
+
+        /* 全局滚动条美化 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            padding: 1rem 2.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #2563eb, #3b82f6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #475569;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            padding: 0.4rem 0.2rem;
+            position: relative;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: #2563eb;
+        }
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #2563eb;
+            border-radius: 1px;
+        }
+        .dropdown-toggle {
+            border-radius: 2rem !important;
+            padding: 0.4rem 1.2rem !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        .dropdown-menu {
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: none;
+            padding: 0.5rem;
+        }
+        .dropdown-item {
+            border-radius: 0.6rem;
+            padding: 0.5rem 1rem;
+            transition: 0.2s;
+        }
+        .dropdown-item:hover {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+        .btn-outline-primary {
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
+            border-color: #cbd5e1;
+            color: #475569;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
+            transition: all 0.25s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        /* 主内容容器 */
+        .main-container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+        .claim-wrapper {
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            display: flex;
+            flex-wrap: wrap;
+            transition: all 0.3s ease;
+        }
+        .claim-wrapper:hover {
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        /* 左侧表单区 */
+        .form-section {
+            flex: 2;
+            padding: 3rem;
+        }
+        /* 右侧信息区 */
+        .info-section {
+            flex: 1;
+            background: #f8fafc;
+            padding: 3rem 2rem;
+            border-left: 1px solid #f1f5f9;
+            min-width: 300px;
+        }
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            color: #1e293b;
+            border-left: 4px solid #2563eb;
+            padding-left: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .policy-detail {
+            background: #ffffff;
+            border-radius: 1.2rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid #f1f5f9;
+        }
+        .policy-detail p {
+            margin-bottom: 0.8rem;
+            font-size: 0.92rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .policy-detail p:last-child { margin-bottom: 0; }
+        .policy-detail strong {
+            color: #334155;
+            font-weight: 600;
+        }
+        .policy-detail span {
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        /* ✅ 终极修复：保障内容滚动穿模（核心修改） */
+        .coverage-box {
+            background: #ffffff;
+            border-radius: 1.2rem;
+            padding: 0; /* 取消内边距，防止穿透 */
+            margin-top: 1rem;
+            border: 1px solid #f1f5f9;
+            max-height: 320px;
+            overflow: hidden; /* 父容器禁止溢出 */
+            position: relative;
+        }
+        .coverage-box h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+            color: #1e293b;
+            /* 绝对固定定位 + 全屏背景 + 最高层级 */
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999; /* 最高层级，彻底杜绝穿透 */
+            background: #ffffff !important;
+            padding: 1.2rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .coverage-content {
+            padding: 1.2rem;
+            margin-top: 50px; /* 避开标题高度 */
+            max-height: 270px;
+            overflow-y: auto; /* 仅内容区域滚动 */
+        }
+        .coverage-content p {
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* 表单样式 */
+        .form-label {
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        .form-label i {
+            color: #2563eb;
+            width: 1.2rem;
+            font-size: 1rem;
+        }
+        .form-control, .form-select {
+            border: 1px solid #e2e8f0;
+            border-radius: 1.2rem;
+            padding: 0.8rem 1.2rem;
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
+            background: #fafbfc;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+            background: #ffffff;
+            outline: none;
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+        .mb-3 { margin-bottom: 1.5rem !important; }
+
+        /* 按钮 */
+        .btn-submit {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border: none;
+            border-radius: 1.5rem;
+            padding: 0.9rem 1.5rem;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 1rem;
+            transition: all 0.25s ease;
+            color: white;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59,130,246,0.25);
+        }
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* 提示框 */
+        .alert-light {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            border-radius: 1rem;
+            color: #1e40af;
+            padding: 1rem 1.2rem;
+            margin-top: 1.5rem !important;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+            .main-container {
+                padding: 0 1rem;
+                margin: 2rem auto;
+            }
+            .claim-wrapper {
+                flex-direction: column;
+            }
+            .form-section, .info-section {
+                padding: 2rem 1.5rem;
+            }
+            .info-section {
+                border-left: none;
+                border-top: 1px solid #f1f5f9;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+        <a href="/" class="logo"><i class="fas fa-shield-alt"></i>运动宝</a>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/insurance/products">保险商城</a>
+            <a href="/calc">运动评估</a>
+            <a href="/user_chat">在线客服</a>
+            {% if session.username %}
+                <div class="dropdown">
+                    <a href="#" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i>{{ session.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/my">个人中心</a></li>
+                        <li><a class="dropdown-item" href="/profile">编辑资料</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout">退出登录</a></li>
+                    </ul>
+                </div>
+            {% else %}
+                <div class="user-menu">
+                    <a href="/login" class="btn btn-outline-primary">登录</a>
+                    <a href="/register" class="btn btn-primary">注册</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="claim-wrapper">
+            <!-- 左侧：理赔表单 -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-file-signature"></i> 理赔申请</h3>
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="claim_amount" class="form-label"><i class="fas fa-coins"></i> 理赔金额（元）</label>
+                        <input type="number" class="form-control" id="claim_amount" name="claim_amount" step="0.01" min="0.01" placeholder="请输入理赔金额" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reason" class="form-label"><i class="fas fa-comment"></i> 理赔原因</label>
+                        <textarea class="form-control" id="reason" name="reason" rows="4" placeholder="请详细描述理赔原因（如：运动中意外受伤）" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="related_record_id" class="form-label"><i class="fas fa-history"></i> 关联运动记录（可选）</label>
+                        <select class="form-select" id="related_record_id" name="related_record_id">
+                            <option value="">无关联</option>
+                            {% for r in records %}
+                            <option value="{{ r.id }}">{{ r.sport_type }} - {{ r.duration }}分钟 - {{ r.create_time }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="evidence" class="form-label"><i class="fas fa-paperclip"></i> 证明材料（模拟填写）</label>
+                        <textarea class="form-control" id="evidence" name="evidence" rows="3" placeholder="如：医院诊断证明链接、照片描述等..."></textarea>
+                    </div>
+                    <div class="action-buttons">
+                        <button type="submit" class="btn-submit"><i class="fas fa-check-circle"></i> 提交申请</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 右侧：保单信息 + 保障内容 -->
+            <div class="info-section">
+                <h3 class="section-title"><i class="fas fa-file-contract"></i> 保单信息</h3>
+                <div class="policy-detail">
+                    <p><strong>保单号</strong> <span>{{ policy.policy_no }}</span></p>
+                    <p><strong>产品名称</strong> <span>{{ product.name if product else '未知' }}</span></p>
+                    <p><strong>保障期限</strong> <span>{{ policy.start_date.strftime('%Y-%m-%d') }} 至 {{ policy.end_date.strftime('%Y-%m-%d') }}</span></p>
+                    <p><strong>投保人</strong> <span>{{ policy.insured_name }}</span></p>
+                    <p><strong>已缴保费</strong> <span>¥{{ policy.premium }}</span></p>
+                </div>
+
+                <!-- ✅ 修复后的保障内容结构 -->
+                <div class="coverage-box">
+                    <h5><i class="fas fa-shield-alt"></i> 保障内容</h5>
+                    <div class="coverage-content">
+                        <p>{{ product.coverage if product and product.coverage else '暂无详细保障内容，请联系客服咨询。' }}</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-light mt-3" role="alert">
+                    <i class="fas fa-info-circle"></i> 请确保填写真实信息，理赔金额不得超过保单约定的保障限额。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js')
+                .then(reg => console.log('Service Worker 注册成功', reg))
+                .catch(err => console.log('Service Worker 注册失败', err));
+        }
+    </script>
+</body>
+</html>

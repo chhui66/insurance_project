@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>运动保险怎么买？ | 运动宝</title>
+    <!-- Bootstrap 5 核心样式 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 优雅字体 Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #eef2f9 0%, #e0e8f0 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 动态背景装饰（与首页一致） */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(66, 153, 225, 0.12) 0%, rgba(66, 153, 225, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -15%;
+            left: -8%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(72, 187, 120, 0.08) 0%, rgba(72, 187, 120, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.8rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #2c5282, #3182ce);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #3182ce;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-outline-primary {
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3182ce, #2c5282);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.4rem 1.2rem;
+        }
+
+        /* 主容器：电脑宽屏布局 */
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 双栏布局 */
+        .two-columns {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        /* 主内容区 */
+        .content-main {
+            flex: 2;
+            min-width: 0; /* 防止溢出 */
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            flex: 1;
+            min-width: 260px;
+            position: sticky;
+            top: 100px;
+        }
+
+        /* 文章卡片 */
+        .article-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .article-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            border-left: 5px solid #3182ce;
+            padding-left: 1rem;
+        }
+
+        .article-meta {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+
+        .article-content {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #2d3748;
+        }
+
+        .article-content h3 {
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            color: #1e2f3e;
+        }
+
+        .article-content p {
+            margin-bottom: 1rem;
+        }
+
+        .article-content ul {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        /* 侧边栏卡片通用样式 */
+        .sidebar-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-card h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            border-left: 3px solid #3182ce;
+            padding-left: 0.75rem;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .toc-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .toc-list a {
+            color: #4a5568;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            display: block;
+        }
+
+        .toc-list a:hover {
+            color: #3182ce;
+            transform: translateX(4px);
+        }
+
+        .product-recommend {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .product-recommend:last-child {
+            border-bottom: none;
+        }
+
+        .product-icon {
+            width: 48px;
+            height: 48px;
+            background: #f1f5f9;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #3182ce;
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .product-price {
+            font-size: 0.8rem;
+            color: #f97316;
+        }
+
+        .btn-sm-custom {
+            background: #3182ce;
+            color: white;
+            border-radius: 2rem;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.75rem;
+            text-decoration: none;
+        }
+
+        .contact-card {
+            background: linear-gradient(135deg, #f8fafc, #ffffff);
+            border: 1px solid #e2e8f0;
+        }
+
+        .contact-card p {
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            margin-top: 1rem;
+            display: inline-block;
+            color: #3182ce;
+            text-decoration: none;
+        }
+
+        .footer-note {
+            background: rgba(230, 242, 255, 0.6);
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #2c5a7a;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 992px) {
+            .two-columns {
+                flex-direction: column;
+            }
+            .sidebar {
+                position: static;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+        <a href="/" class="logo"><i class="fas fa-shield-alt me-2"></i>运动宝</a>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/insurance/products">保险商城</a>
+            <a href="/calc">运动评估</a>
+            {% if session.username %}
+                <div class="dropdown">
+                    <a href="#" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i>{{ session.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/my">个人中心</a></li>
+                        <li><a class="dropdown-item" href="/profile">编辑资料</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout">退出登录</a></li>
+                    </ul>
+                </div>
+            {% else %}
+                <div class="user-menu">
+                    <a href="/login" class="btn btn-outline-primary">登录</a>
+                    <a href="/register" class="btn btn-primary">注册</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="two-columns">
+            <!-- 主内容区 -->
+            <div class="content-main">
+                <div class="article-card">
+                    <h1 class="article-title">运动保险怎么买？</h1>
+                    <div class="article-meta">
+                        <i class="far fa-calendar-alt"></i> 2025-03-27 &nbsp;|&nbsp;
+                        <i class="far fa-clock"></i> 约5分钟阅读
+                    </div>
+                    <div class="article-content">
+                        <p>运动保险是为参与各类体育活动的人群提供意外伤害保障的保险产品。无论是日常健身、跑步，还是参加马拉松、球类比赛，购买一份合适的运动保险都非常重要。以下是如何选择并购买运动保险的详细指南：</p>
+                        <h3>1. 明确需求</h3>
+                        <p>首先确定你的运动类型和频率。如果是低强度运动（如慢跑、瑜伽），可选择基础意外险；如果经常参与高风险运动（如篮球、滑雪、马拉松），则需要专项运动意外险，保障额度更高。</p>
+                        <h3>2. 关注保障内容</h3>
+                        <p>一份好的运动保险应包含：意外身故/伤残（至少10万）、意外医疗（含门诊和住院，免赔额低）、紧急救援服务、以及是否包含猝死保障（对于高强度运动尤为重要）。</p>
+                        <h3>3. 根据年龄和健康选择</h3>
+                        <p>年轻人可选择保额较高、保费适中的产品；中老年人则需关注是否承保既往症、意外医疗的报销比例。本平台会根据你的年龄和BMI智能推荐合适产品。</p>
+                        <h3>4. 计算保费与保障天数</h3>
+                        <p>运动保险通常按天计费，你可选择单次保障（如周末比赛）或长期保障（如一个月）。保费会根据运动类型、保障额度和你的风险等级浮动。</p>
+                        <h3>5. 在线投保步骤</h3>
+                        <p>在本平台，你只需登录后进入“保险商城”，选择心仪产品，填写投保信息（被保险人姓名、身份证、联系方式），选择保障天数，确认保费并支付即可。保单会立即生效，电子保单可随时下载。</p>
+                        <h3>6. 注意事项</h3>
+                        <ul>
+                            <li>仔细阅读免责条款（如酒后运动、职业比赛等可能不赔）。</li>
+                            <li>保留好运动记录（如运动记录、赛事证明），以便理赔时使用。</li>
+                            <li>如有疑问，可随时联系在线客服或拨打客服热线。</li>
+                        </ul>
+                        <p>现在就去“保险商城”挑选一份适合自己的运动保障吧！</p>
+                    </div>
+                    <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> 返回首页</a>
+                </div>
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <!-- 目录导航 -->
+                <div class="sidebar-card">
+                    <h4><i class="fas fa-list-ul me-2"></i> 文章目录</h4>
+                    <ul class="toc-list">
+                        <li><a href="#需求">1. 明确需求</a></li>
+                        <li><a href="#保障内容">2. 关注保障内容</a></li>
+                        <li><a href="#年龄健康">3. 根据年龄和健康选择</a></li>
+                        <li><a href="#保费计算">4. 计算保费与保障天数</a></li>
+                        <li><a href="#投保步骤">5. 在线投保步骤</a></li>
+                        <li><a href="#注意事项">6. 注意事项</a></li>
+                    </ul>
+                </div>
+
+                <!-- 推荐产品（示例） -->
+                <div class="sidebar-card">
+                    <h4><i class="fas fa-shield-heart me-2"></i> 热门推荐</h4>
+                    <div class="product-recommend">
+                        <div class="product-icon"><i class="fas fa-bicycle"></i></div>
+                        <div class="product-info">
+                            <div class="product-name">吃饭健康险</div>
+                            <div class="product-price">¥1/天</div>
+                        </div>
+                        <a href="/insurance/buy/1" class="btn-sm-custom">查看</a>
+                    </div>
+                    <div class="product-recommend">
+                        <div class="product-icon"><i class="fas fa-heartbeat"></i></div>
+                        <div class="product-info">
+                            <div class="product-name">篮球单场意外险</div>
+                            <div class="product-price">¥10/天</div>
+                        </div>
+                        <a href="/insurance/buy/2" class="btn-sm-custom">查看</a>
+                    </div>
+                    <div class="product-recommend">
+                        <div class="product-icon"><i class="fas fa-dumbbell"></i></div>
+                        <div class="product-info">
+                            <div class="product-name">登山意外险</div>
+                            <div class="product-price">¥15/天</div>
+                        </div>
+                        <a href="/insurance/buy/3" class="btn-sm-custom">查看</a>
+                    </div>
+                </div>
+
+                <!-- 客服联系卡片 -->
+                <div class="sidebar-card contact-card">
+                    <h4><i class="fas fa-headset me-2"></i> 需要帮助？</h4>
+                    <p><i class="fas fa-phone-alt me-2"></i> 客服热线：202205000626</p>
+                    <p><i class="fas fa-envelope me-2"></i> 邮箱：15353935200@163.com</p>
+                    <p><i class="fas fa-clock me-2"></i> 服务时间：9:00-21:00</p>
+                    <a href="/user_chat" class="btn btn-outline-primary btn-sm w-100 mt-2">在线咨询</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <i class="fas fa-bolt"></i> 平台功能：BMI计算 | 基础代谢率(BMR)计算 | 运动卡路里消耗 | 个性化运动计划推荐 | 运动记录管理 | 数据可视化 | 智能保险推荐 | 在线投保理赔
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 平滑滚动到锚点
+        document.querySelectorAll('.toc-list a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>保单管理 | 后台</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/sw.js')
+    .then(reg => console.log('Service Worker 注册成功', reg))
+    .catch(err => console.log('Service Worker 注册失败', err));
+}
+</script>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand">保单管理</span>
+            <div class="navbar-nav ms-auto">
+                <a href="/admin/dashboard" class="nav-link">仪表盘</a>
+                <a href="/admin/logout" class="nav-link text-danger">退出</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2>用户保单列表</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>保单号</th>
+                        <th>产品名称</th>
+                        <th>被保险人</th>
+                        <th>保费(元)</th>
+                        <th>生效日期</th>
+                        <th>到期日期</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in policies %}
+                    <tr>
+                        <td>{{ p.id }}</td>
+                        <td>{{ p.username }}</td>
+                        <td>{{ p.policy_no }}</td>
+                        <td>{{ p.product_name }}</td>
+                        <td>{{ p.insured_name }}</td>
+                        <td>{{ p.premium }}</td>
+                        <td>{{ p.start_date }}</td>
+                        <td>{{ p.end_date }}</td>
+                        <td>
+                            {% if p.status == '有效' %}
+                            <span class="badge bg-success">有效</span>
+                            {% elif p.status == '已过期' %}
+                            <span class="badge bg-secondary">已过期</span>
+                            {% else %}
+                            <span class="badge bg-danger">{{ p.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <a href="/admin/dashboard" class="btn btn-secondary">返回仪表盘</a>
+    </div>
+</body>
+</html>

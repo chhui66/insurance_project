@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>运动数据分析 | 运动宝</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(145deg, #eef2f9 0%, #e0e8f0 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+        }
+        .top-nav {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.8rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #2c5282, #3182ce);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active { color: #3182ce; }
+        .user-menu { display: flex; align-items: center; gap: 1rem; }
+        .btn-outline-primary { border-radius: 2rem; padding: 0.4rem 1.2rem; }
+        .btn-primary { background: linear-gradient(135deg, #3182ce, #2c5282); border: none; border-radius: 2rem; padding: 0.4rem 1.2rem; }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c5282;
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #2c5282, #1e3a5f);
+            padding: 1rem 1.5rem;
+            color: white;
+        }
+        .card-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .chart-container {
+            height: 400px;
+            width: 100%;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        .table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0 2rem;
+        }
+        @media (max-width: 768px) {
+            .top-nav { flex-direction: column; gap: 0.5rem; padding: 0.8rem 1rem; }
+            .nav-links { flex-wrap: wrap; justify-content: center; gap: 1rem; }
+            .main-container { padding: 0 1rem; }
+            .chart-container { height: 300px; }
+            .stats-grid { gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <a href="/" class="logo"><i class="fas fa-shield-alt me-2"></i>运动宝</a>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/insurance/products">保险商城</a>
+            <a href="/calc">运动评估</a>
+            {% if session.username %}
+                <div class="dropdown">
+                    <a href="#" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i>{{ session.username }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/my">个人中心</a></li>
+                        <li><a class="dropdown-item" href="/profile">编辑资料</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout">退出登录</a></li>
+                    </ul>
+                </div>
+            {% else %}
+                <div class="user-menu">
+                    <a href="/login" class="btn btn-outline-primary">登录</a>
+                    <a href="/register" class="btn btn-primary">注册</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="main-container">
+        {% if records|length == 0 %}
+            <div class="alert alert-info text-center p-5">
+                <i class="fas fa-chart-simple fa-3x mb-3"></i>
+                <h5>暂无运动数据可分析</h5>
+                <p>快去<a href="/calc" class="alert-link">计算运动数据</a>并保存记录吧！</p>
+            </div>
+        {% else %}
+            {# 计算摘要数据 #}
+            {% set total_duration = records|sum(attribute='duration') %}
+            {% set total_calorie = records|sum(attribute='calorie') %}
+            {% set avg_calorie = (total_calorie / records|length)|round(1) if records|length > 0 else 0 %}
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{{ records|length }}</div>
+                    <div class="stat-label">总运动次数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ total_duration }}</div>
+                    <div class="stat-label">总时长（分钟）</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ "%.2f"|format(total_calorie) }}</div>
+                    <div class="stat-label">总消耗（大卡）</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ "%.2f"|format(avg_calorie) }}</div>
+                    <div class="stat-label">平均单次消耗（大卡）</div>
+                </div>
+            </div>
+
+            <!-- 图表1：柱状图 -->
+            <div class="chart-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> 各运动类型总时长统计</h3>
+                </div>
+                <div class="card-body">
+                    <div id="durationChart" class="chart-container"></div>
+                </div>
+            </div>
+
+            <!-- 图表2：饼图 -->
+            <div class="chart-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-pie"></i> 各运动类型卡路里消耗占比</h3>
+                </div>
+                <div class="card-body">
+                    <div id="caloriePie" class="chart-container"></div>
+                </div>
+            </div>
+
+            <!-- 图表3：折线图（已修复日期显示） -->
+            <div class="chart-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-line"></i> 近30天运动卡路里趋势</h3>
+                </div>
+                <div class="card-body">
+                    <div id="trendChart" class="chart-container"></div>
+                </div>
+            </div>
+
+            <!-- 数据明细表格 -->
+            <div class="chart-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-table-list"></i> 最近运动记录</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>运动类型</th>
+                                    <th>时长（分钟）</th>
+                                    <th>消耗（大卡）</th>
+                                    <th>记录时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in records[:5] %}
+                                <tr>
+                                    <td>{{ record.sport_type }}</td>
+                                    <td>{{ record.duration }}</td>
+                                    <td>{{ record.calorie }}</td>
+                                    <td>{{ record.create_time }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if records|length > 5 %}
+                    <div class="text-center mt-3">
+                        <a href="/record" class="btn btn-sm btn-outline-secondary">查看全部 {{ records|length }} 条记录 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="/record" class="btn btn-outline-secondary">
+                    <i class="fas fa-clipboard-list"></i> 查看完整记录
+                </a>
+                <a href="/calc" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> 新增运动数据
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const records = {{ records|tojson|safe }};
+            if (!records || records.length === 0) return;
+
+            // 1. 柱状图：各运动类型总时长
+            const stats = {};
+            records.forEach(record => {
+                const type = record.sport_type;
+                if (!stats[type]) stats[type] = { duration: 0, calorie: 0 };
+                stats[type].duration += record.duration;
+                stats[type].calorie += record.calorie;
+            });
+            const sportTypes = Object.keys(stats);
+            const durations = sportTypes.map(t => stats[t].duration);
+            const calories = sportTypes.map(t => stats[t].calorie);
+
+            const durationChart = echarts.init(document.getElementById('durationChart'));
+            durationChart.setOption({
+                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                xAxis: { type: 'category', data: sportTypes, axisLabel: { rotate: 30, fontWeight: 500 } },
+                yAxis: { type: 'value', name: '时长（分钟）' },
+                series: [{
+                    name: '运动时长',
+                    type: 'bar',
+                    data: durations,
+                    itemStyle: { borderRadius: [5,5,0,0], color: '#3182ce' },
+                    label: { show: true, position: 'top', fontWeight: 'bold' }
+                }],
+                grid: { containLabel: true, top: 40 }
+            });
+
+            // 2. 饼图：卡路里消耗占比
+            const pieChart = echarts.init(document.getElementById('caloriePie'));
+            pieChart.setOption({
+                tooltip: { trigger: 'item', formatter: '{b}: {c} 大卡 ({d}%)' },
+                legend: { orient: 'vertical', left: 'left' },
+                series: [{
+                    name: '卡路里消耗',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    data: sportTypes.map((t, i) => ({ name: t, value: calories[i] })),
+                    label: { show: true, position: 'outside', formatter: '{b}' },
+                    emphasis: { scale: true }
+                }]
+            });
+
+            // 3. 折线图：近30天卡路里趋势（按日期聚合，兼容多种日期格式）
+            const dateMap = new Map();
+            records.forEach(record => {
+                // 统一转换为 Date 对象
+                let dateObj = new Date(record.create_time);
+                // 如果解析失败，尝试提取 YYYY-MM-DD
+                if (isNaN(dateObj.getTime())) {
+                    const match = String(record.create_time).match(/\d{4}-\d{2}-\d{2}/);
+                    if (match) {
+                        dateObj = new Date(match[0]);
+                    } else {
+                        return; // 无法解析则跳过此记录
+                    }
+                }
+                // 格式化为 YYYY-MM-DD
+                const year = dateObj.getFullYear();
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const dateKey = `${year}-${month}-${day}`;
+                if (!dateMap.has(dateKey)) dateMap.set(dateKey, 0);
+                dateMap.set(dateKey, dateMap.get(dateKey) + record.calorie);
+            });
+
+            const sortedDates = Array.from(dateMap.keys()).sort();
+            const last30Dates = sortedDates.slice(-30);
+            const calorieTrend = last30Dates.map(d => dateMap.get(d));
+
+            const trendChart = echarts.init(document.getElementById('trendChart'));
+            trendChart.setOption({
+                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                xAxis: {
+                    type: 'category',
+                    data: last30Dates,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10,
+                        // 中文日期格式化
+                        formatter: function(value) {
+                            const parts = value.split('-');
+                            if (parts.length === 3) {
+                                return `${parseInt(parts[1])}月${parseInt(parts[2])}日`;
+                            }
+                            return value;
+                        }
+                    }
+                },
+                yAxis: { type: 'value', name: '卡路里（大卡）' },
+                series: [{
+                    name: '运动消耗',
+                    type: 'line',
+                    data: calorieTrend,
+                    smooth: true,
+                    lineStyle: { width: 3, color: '#f59e0b' },
+                    symbol: 'circle',
+                    symbolSize: 6,
+                    areaStyle: { opacity: 0.1, color: '#f59e0b' }
+                }],
+                grid: { containLabel: true, top: 40 }
+            });
+
+            window.addEventListener('resize', () => {
+                durationChart.resize();
+                pieChart.resize();
+                trendChart.resize();
+            });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
